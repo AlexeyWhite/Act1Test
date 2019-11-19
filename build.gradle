@@ -1,0 +1,179 @@
+apply plugin: 'java'
+apply plugin: 'maven-publish'
+apply plugin: 'eclipse'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+version = file('version').text
+ext.tf_vendor = 'Triniforce.com'
+
+// Project configuration is used for Maven  deploy:
+//groupId = 
+//artifactId = 'tf-server-toolkit'
+
+// Get dynamic environment settings
+apply from: 'config.gradle'
+
+ext.testFolderDir = new File(buildDir, 'test')
+
+
+defaultTasks 'clean', 'ide'
+
+repositories {
+	
+//	mavenCentral()
+//	maven {
+//		url MavenResolveUrl
+//		credentials(PasswordCredentials) {
+//			username = MavenUsername
+//			password = MavenPassword
+//		}
+
+//	}
+	maven {
+		url 'https://maven.pkg.github.com/'
+		credentials(PasswordCredentials) {
+			username = MavenUsername
+			password = MavenPassword
+		}
+	}
+}
+
+processResources {
+	from('src') {
+		include '**/*.properties'
+		include '**/*.wiki'
+		include '**/*.bsh'
+		include '**/*.htm'
+	}
+	from('test') {
+		include '**/*.jar'
+		include '**/*.bs'
+		include '**/*.txt'
+		include '**/*.properties'
+		include '**/*.soap'
+		include '**/*.wiki'
+	
+	}
+}
+
+configurations {
+	providedCompile
+}
+
+dependencies {
+
+}
+
+sourceSets.main.compileClasspath += configurations.providedCompile
+sourceSets.test.compileClasspath += configurations.providedCompile
+sourceSets.test.runtimeClasspath += configurations.providedCompile
+
+sourceSets {
+	main.java.srcDirs = ['src']
+	test.java.srcDirs = ['test']
+}
+
+
+//eclipseJdt << {
+//	file('.settings/org.eclipse.core.resources.prefs').write(
+//	  'eclipse.preferences.version=1\n' +
+//	  'encoding/<project>=UTF-8\n'
+//	)
+//}
+
+task ide(dependsOn: tasks.eclipse) {
+	group = 'IDE'
+	description = 'preparing for work in the development environment'
+}
+
+task sourcesJar(type: Jar) {
+	classifier = 'sources'
+	from sourceSets.main.allSource
+}
+
+artifacts {
+	archives sourcesJar
+}
+
+//uploadArchives {
+//	repositories.mavenDeployer {
+//		uniqueVersion = false
+//		repository(url: MavenPublishUrl) {
+//			authentication(userName: MavenPublishUsername, password: MavenPublishPassword)
+//		}
+//		snapshotRepository(url: MavenPublishSnapshotUrl) {
+//			authentication(userName: MavenPublishUsername, password: MavenPublishPassword)
+//		}
+//	}
+//}
+
+publishing {
+//	publications {
+//            maven(MavenPublication) {
+//                groupId = 'com.triniforce'
+//                artifactId = 'tf-server-toolkit'
+//                version = version
+
+//                from components.java
+//            }
+//        }
+
+    repositories {
+        maven {
+//            def releasesRepoUrl = "$buildDir/repos/releases"
+//            def snapshotsRepoUrl = "$buildDir/repos/snapshots"
+            name = "GitHubPackages"
+            url = 'https://maven.pkg.github.com/alexeywhite/act1test/'
+            credentials {
+                username = 'AlexeyWhite'
+                password = '3a31adfee89ad7e58d9ed280781d7004976479d6'
+            }
+        }
+    }
+
+        publications {
+            gpr(MavenPublication) {
+                groupId = 'ias.test'
+                artifactId = 'act1test'
+                version = version
+
+                from(components.java)
+            }
+        }
+}
+
+task jar_lib(type: Copy, dependsOn:[jar]){
+	from "${jar.destinationDir}/${jar.archiveName}"
+	into "$System.env.TF_LIB_HOME/srvdist"
+	rename { String fileName -> 'tf-server-toolkit.jar' }
+}
+
+jar_lib.doFirst{
+	def envName ="TF_LIB_HOME"
+	def env = System.env[envName]
+	if (null == env || env.length() == 0){
+		throw new StopExecutionException("Variable $envName must point to TF_LIB HOME")
+	}
+}
+
+jar {
+	manifest {
+		attributes(
+			"Specification-Title": project.name,
+			"Specification-Version": version,
+			"Specification-Vendor": tf_vendor,
+			"Implementation-Title": project.name,
+			"Implementation-Version": "$version (${new Date().format('yyyy-MM-dd')})",
+			"Implementation-Vendor": tf_vendor
+		)
+	}
+}
+
+//task outputDirs << { sourceSets.test.java.srcDirs.each{f -> println(f)}}
+
+//war {
+//	from 'war'
+//}
