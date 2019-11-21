@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     env: 
       UNTILL_GITHUB_REGISTRY_USERNAME: AlexeyWhite
-      UNTILL_GITHUB_REGISTRY_TOKEN: GITHUB_TOKEN
+      UNTILL_GITHUB_REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
     - uses: actions/checkout@v1
