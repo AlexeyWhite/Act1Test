@@ -23,14 +23,14 @@ defaultTasks 'clean', 'ide'
 repositories {
 
 	//	mavenCentral()
-	//	maven {
-	//		url MavenResolveUrl
-	//		credentials(PasswordCredentials) {
-	//			username = MavenUsername
-	//			password = MavenPassword
-	//		}
+		maven {
+			url MavenResolveUrl
+			credentials(PasswordCredentials) {
+				username = MavenUsername
+				password = MavenPassword
+			}
 
-	//	}
+		}
 }
 
 processResources {
@@ -54,6 +54,7 @@ processResources {
 configurations { providedCompile }
 
 dependencies {
+	compile(group: 'net.sf.sojo', name: 'sojo', version: '1.0.0') //NOTE: this is a copy from tflib. Modern versions is not comatible with Tomcat
 
 }
 

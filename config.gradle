@@ -1,3 +1,10 @@
+adjustProperty('MavenBaseUrl', 'https://dev.untill.com/artifactory')
+adjustProperty('MavenUsername', null, true)
+adjustProperty('MavenPassword', null, true)
+adjustProperty('MavenResolveUrl', combineUrl(MavenBaseUrl, 'repo'))
+adjustProperty('MavenResolveRealm', 'Artifactory Realm')
+adjustProperty('MavenResolveHost', new URL(MavenResolveUrl).host)
+
 adjustProperty('GithubRegistryUsername', null, true)
 adjustProperty('GithubRegistryToken', null, true)
 
