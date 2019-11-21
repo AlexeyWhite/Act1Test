@@ -7,7 +7,7 @@ jobs:
 
     runs-on: ubuntu-latest
     env: 
-      UNTILL_GITHUB_REGISTRY_USERNAME: AlexeyWhite
+      UNTILL_GITHUB_REGISTRY_USERNAME: 
       UNTILL_GITHUB_REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
